@@ -1,0 +1,70 @@
+{% extends 'control/base.html' %}
+
+{% block title %}{{ entity_name }} | Sonrisa Perfecta{% endblock %}
+
+{% block content %}
+<section class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+        <p class="text-sm font-semibold uppercase tracking-wider text-cyan-700">Gestión</p>
+        <h1 class="mt-1 text-3xl font-bold text-slate-900">{{ entity_name_plural }}</h1>
+    </div>
+    <a href="{{ create_url }}" class="rounded-lg bg-cyan-800 px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-cyan-900">{{ create_label }}</a>
+</section>
+
+<section class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm print-shadow-none">
+    <form method="get" class="flex flex-col gap-3 border-b border-slate-200 p-4 xl:flex-row xl:items-end">
+        <div class="flex-1">
+            <label for="q" class="mb-1 block text-sm font-medium text-slate-700">Buscar</label>
+            <input id="q" name="q" type="search" value="{{ search_query }}" placeholder="Escribe para buscar..." class="form-input">
+        </div>
+        {% if entity_name == "Cita" %}
+            {% for field in agenda_filter_form %}
+                <div>
+                    <label for="{{ field.id_for_label }}" class="mb-1 block text-sm font-medium text-slate-700">{{ field.label }}</label>
+                    {{ field }}
+                    {% for error in field.errors %}<p class="mt-1 text-xs text-rose-700">{{ error }}</p>{% endfor %}
+                </div>
+            {% endfor %}
+        {% endif %}
+        <div class="flex gap-2">
+            <button type="submit" class="rounded-lg bg-slate-800 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-900">Filtrar</button>
+            <a href="{{ request.path }}" class="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50">Limpiar</a>
+        </div>
+    </form>
+
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-200">
+            <thead class="bg-slate-50">
+                <tr>
+                    {% for column in columns %}<th scope="col" class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">{{ column }}</th>{% endfor %}
+                    <th scope="col" class="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                {% for row in rows %}
+                    <tr class="hover:bg-slate-50">
+                        {% for value in row.values %}
+                            <td class="max-w-xs px-5 py-4 text-sm text-slate-700">{{ value|default:"—" }}</td>
+                        {% endfor %}
+                        <td class="whitespace-nowrap px-5 py-4 text-right text-sm">
+                            <a href="{{ row.edit_url }}" class="font-semibold text-cyan-800 hover:text-cyan-950">Editar</a>
+                            <a href="{{ row.delete_url }}" class="ml-4 font-semibold text-rose-700 hover:text-rose-900">Eliminar</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="{{ columns|length|add:1 }}" class="px-5 py-12 text-center text-sm text-slate-500">No hay registros para mostrar.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if is_paginated %}
+        <nav class="flex items-center justify-between border-t border-slate-200 px-5 py-4" aria-label="Paginación">
+            <span class="text-sm text-slate-600">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+            <div class="flex gap-2">
+                {% if page_obj.has_previous %}<a href="?q={{ search_query|urlencode }}&fecha={{ request.GET.fecha|urlencode }}&estado={{ request.GET.estado|urlencode }}&sillon={{ request.GET.sillon|urlencode }}&page={{ page_obj.previous_page_number }}" class="rounded-lg border border-slate-300 px-3 py-2 text-sm">Anterior</a>{% endif %}
+                {% if page_obj.has_next %}<a href="?q={{ search_query|urlencode }}&fecha={{ request.GET.fecha|urlencode }}&estado={{ request.GET.estado|urlencode }}&sillon={{ request.GET.sillon|urlencode }}&page={{ page_obj.next_page_number }}" class="rounded-lg border border-slate-300 px-3 py-2 text-sm">Siguiente</a>{% endif %}
+            </div>
+        </nav>
+    {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "control/base.html" %}
+
+{% block title %}{% if object %}Editar paciente{% else %}Registrar paciente{% endif %} | Sonrisa Perfecta{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-3xl">
+    <a href="{% url 'control:paciente_list' %}" class="text-sm font-semibold text-cyan-700 hover:text-cyan-900">
+        &larr; Volver a pacientes
+    </a>
+    <div class="mt-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+        <div class="mb-6">
+            <p class="text-sm font-semibold uppercase tracking-wider text-cyan-700">Ficha del paciente</p>
+            <h1 class="mt-1 text-2xl font-bold text-slate-900">
+                {% if object %}Editar paciente{% else %}Registrar paciente{% endif %}
+            </h1>
+            <p class="mt-2 text-sm text-slate-600">Completa los datos solicitados para guardar la ficha.</p>
+        </div>
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="mb-5 rounded-lg border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+            <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                {% for field in form %}
+                    <div class="{% if field.name == 'direccion' %}sm:col-span-2{% endif %}">
+                        <label for="{{ field.id_for_label }}" class="mb-1.5 block text-sm font-medium text-slate-700">
+                            {{ field.label }}
+                        </label>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <p class="mt-1 text-xs text-slate-500">{{ field.help_text }}</p>
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <p class="mt-1 text-sm text-rose-700">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="mt-8 flex flex-col-reverse gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:justify-end">
+                <a href="{% url 'control:paciente_list' %}"
+                   class="rounded-lg border border-slate-300 px-4 py-2.5 text-center text-sm font-semibold text-slate-700 hover:bg-slate-50">
+                    Cancelar
+                </a>
+                <button type="submit"
+                        class="rounded-lg bg-cyan-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-cyan-800 focus:outline-none focus:ring-2 focus:ring-cyan-600 focus:ring-offset-2">
+                    Guardar paciente
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

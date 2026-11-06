@@ -1,0 +1,79 @@
+{% extends 'control/base.html' %}
+{% load static %}
+
+{% block title %}Pacientes | Sonrisa Perfecta{% endblock %}
+
+{% block content %}
+<section class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+        <p class="text-sm font-semibold uppercase tracking-wider text-cyan-700">Directorio</p>
+        <h1 class="mt-1 text-3xl font-bold text-slate-900">Pacientes</h1>
+        <p class="mt-2 text-sm text-slate-600">Consulta y administra las fichas de pacientes.</p>
+    </div>
+    <a href="{% url 'control:paciente_create' %}" class="rounded-lg bg-cyan-800 px-4 py-2.5 text-center text-sm font-semibold text-white hover:bg-cyan-900">
+        Registrar paciente
+    </a>
+</section>
+
+<section class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm print-shadow-none">
+    <form method="get" class="flex flex-col gap-3 border-b border-slate-200 p-4 sm:flex-row">
+        <label for="q" class="sr-only">Buscar por nombre, DNI o correo</label>
+        <input id="q" name="q" type="search" value="{{ search_query }}" placeholder="Buscar por nombre, DNI o correo" class="form-input sm:max-w-md">
+        <div class="flex gap-2">
+            <button type="submit" class="rounded-lg bg-slate-800 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-900">Buscar</button>
+            {% if search_query %}<a href="{% url 'control:paciente_list' %}" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700">Limpiar</a>{% endif %}
+        </div>
+    </form>
+
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-200">
+            <thead class="bg-slate-50">
+                <tr>
+                    <th scope="col" class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Paciente</th>
+                    <th scope="col" class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">DNI</th>
+                    <th scope="col" class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Contacto</th>
+                    <th scope="col" class="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Nacimiento</th>
+                    <th scope="col" class="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                {% for paciente in pacientes %}
+                    <tr class="hover:bg-slate-50">
+                        <td class="whitespace-nowrap px-5 py-4">
+                            <p class="font-semibold text-slate-900">{{ paciente.apellidos }}, {{ paciente.nombres }}</p>
+                            <p class="mt-1 text-sm text-slate-500">{{ paciente.direccion }}</p>
+                        </td>
+                        <td class="whitespace-nowrap px-5 py-4 text-sm">{{ paciente.dni }}</td>
+                        <td class="px-5 py-4 text-sm">
+                            <p>{{ paciente.telefono }}</p><p class="mt-1 text-slate-500">{{ paciente.correo }}</p>
+                        </td>
+                        <td class="whitespace-nowrap px-5 py-4 text-sm">{{ paciente.fecha_nacimiento|date:"d/m/Y" }}</td>
+                        <td class="whitespace-nowrap px-5 py-4 text-right text-sm">
+                            <a href="{% url 'control:paciente_update' paciente.pk %}" class="font-semibold text-cyan-800 hover:text-cyan-950">Editar</a>
+                            <a href="{% url 'control:paciente_delete' paciente.pk %}" class="ml-4 font-semibold text-rose-700 hover:text-rose-900">Eliminar</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5" class="px-5 py-12 text-center">
+                            <img src="{% static 'images/odontologia.png' %}" alt="" class="mx-auto mb-4 h-12 w-12 object-contain opacity-70">
+                            <p class="font-semibold text-slate-800">Aún no hay pacientes registrados</p>
+                            <p class="mt-1 text-sm text-slate-500">{% if search_query %}No se encontraron coincidencias. Prueba otra búsqueda.{% else %}Registra el primer paciente para comenzar.{% endif %}</p>
+                            <a href="{% url 'control:paciente_create' %}" class="mt-5 inline-flex rounded-lg bg-cyan-800 px-4 py-2.5 text-sm font-semibold text-white hover:bg-cyan-900">Registrar paciente</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if is_paginated %}
+        <nav class="flex items-center justify-between border-t border-slate-200 px-5 py-4" aria-label="Paginación">
+            <span class="text-sm text-slate-600">Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+            <div class="flex gap-2">
+                {% if page_obj.has_previous %}<a href="?q={{ search_query|urlencode }}&page={{ page_obj.previous_page_number }}" class="rounded-lg border border-slate-300 px-3 py-2 text-sm">Anterior</a>{% endif %}
+                {% if page_obj.has_next %}<a href="?q={{ search_query|urlencode }}&page={{ page_obj.next_page_number }}" class="rounded-lg border border-slate-300 px-3 py-2 text-sm">Siguiente</a>{% endif %}
+            </div>
+        </nav>
+    {% endif %}
+</section>
+{% endblock %}

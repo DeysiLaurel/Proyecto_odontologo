@@ -1,0 +1,37 @@
+{% extends 'control/base.html' %}
+{% load static %}
+
+{% block title %}{{ page_title }} | Sonrisa Perfecta{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-3xl">
+    <a href="{{ cancel_url }}" class="text-sm font-semibold text-cyan-800 hover:text-cyan-950">&larr; Volver a {{ entity_name|lower }}</a>
+    <section class="mt-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+        <p class="text-sm font-semibold uppercase tracking-wider text-cyan-700">Ficha de gestión</p>
+        <h1 class="mt-1 flex items-center text-2xl font-bold text-slate-900">
+            {% if entity_name == "Odontólogo" %}
+                <img src="{% static 'images/odontologia.png' %}" alt="Logo Odontología" class="w-10 h-10 object-contain inline-block mr-2">
+            {% endif %}
+            {{ page_title }}
+        </h1>
+        <form method="post" class="mt-6">
+            {% csrf_token %}
+            {% if form.non_field_errors %}<div class="mb-4 rounded-lg bg-rose-50 p-3 text-sm text-rose-800">{{ form.non_field_errors }}</div>{% endif %}
+            <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                {% for field in form %}
+                    <div class="{% if field.field.widget.attrs.rows %}sm:col-span-2{% endif %}">
+                        <label for="{{ field.id_for_label }}" class="mb-1.5 block text-sm font-medium text-slate-700">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}<p class="mt-1 text-xs text-slate-500">{{ field.help_text }}</p>{% endif %}
+                        {% for error in field.errors %}<p class="mt-1 text-sm text-rose-700">{{ error }}</p>{% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="mt-8 flex flex-col-reverse gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:justify-end">
+                <a href="{{ cancel_url }}" class="rounded-lg border border-slate-300 px-4 py-2.5 text-center text-sm font-semibold text-slate-700 hover:bg-slate-50">Cancelar</a>
+                <button type="submit" class="rounded-lg bg-cyan-800 px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:scale-[1.01] hover:bg-cyan-900 focus:outline-none focus:ring-2 focus:ring-cyan-500/40 focus:ring-offset-2">Guardar {{ entity_name|lower }}</button>
+            </div>
+        </form>
+    </section>
+</div>
+{% endblock %}

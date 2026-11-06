@@ -1,0 +1,59 @@
+{% extends 'control/base.html' %}
+
+{% block title %}Dashboard | Sonrisa Perfecta{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <p class="text-sm font-semibold uppercase tracking-wider text-cyan-700">Resumen del consultorio</p>
+    <h1 class="mt-1 text-3xl font-bold text-slate-900">Dashboard</h1>
+    <p class="mt-2 text-sm text-slate-600">Indicadores actualizados desde los registros del sistema.</p>
+</div>
+<section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <article class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <p class="text-sm font-medium text-slate-500">Pacientes registrados</p>
+        <p class="mt-3 text-3xl font-bold text-slate-900">{{ total_pacientes }}</p>
+        <a href="{% url 'control:paciente_list' %}" class="mt-3 inline-block text-sm font-semibold text-cyan-800">Ver pacientes &rarr;</a>
+    </article>
+    <article class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <p class="text-sm font-medium text-slate-500">Citas de hoy</p>
+        <p class="mt-3 text-3xl font-bold text-slate-900">{{ citas_hoy }}</p>
+        <a href="{% url 'control:cita_list' %}" class="mt-3 inline-block text-sm font-semibold text-cyan-800">Ver agenda &rarr;</a>
+    </article>
+    <article class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <p class="text-sm font-medium text-slate-500">Tratamientos activos</p>
+        <p class="mt-3 text-3xl font-bold text-slate-900">{{ tratamientos_activos }}</p>
+        <a href="{% url 'control:tratamiento_list' %}" class="mt-3 inline-block text-sm font-semibold text-cyan-800">Ver tratamientos &rarr;</a>
+    </article>
+    <article class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+        <p class="text-sm font-medium text-slate-500">Diagnósticos registrados</p>
+        <p class="mt-3 text-3xl font-bold text-slate-900">{{ total_diagnosticos }}</p>
+        <a href="{% url 'control:diagnostico_list' %}" class="mt-3 inline-block text-sm font-semibold text-cyan-800">Ver diagnósticos &rarr;</a>
+    </article>
+</section>
+<section class="mt-7 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+    <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+        <div><h2 class="font-semibold text-slate-900">Próximas citas</h2><p class="mt-1 text-sm text-slate-500">Agenda futura y citas del día</p></div>
+        <a href="{% url 'control:cita_create' %}" class="rounded-lg bg-cyan-800 px-3 py-2 text-sm font-semibold text-white">Agendar cita</a>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-200">
+            <thead class="bg-slate-50"><tr>
+                <th class="px-5 py-3 text-left text-xs font-semibold uppercase text-slate-500">Fecha y hora</th>
+                <th class="px-5 py-3 text-left text-xs font-semibold uppercase text-slate-500">Paciente</th>
+                <th class="px-5 py-3 text-left text-xs font-semibold uppercase text-slate-500">Odontólogo</th>
+                <th class="px-5 py-3 text-left text-xs font-semibold uppercase text-slate-500">Estado</th>
+            </tr></thead>
+            <tbody class="divide-y divide-slate-100">
+                {% for cita in proximas_citas %}
+                    <tr>
+                        <td class="whitespace-nowrap px-5 py-4 text-sm">{{ cita.fecha|date:"d/m/Y" }} · {{ cita.hora|time:"H:i" }}</td>
+                        <td class="px-5 py-4 text-sm">{{ cita.paciente }}</td>
+                        <td class="px-5 py-4 text-sm">{{ cita.odontologo }}</td>
+                        <td class="px-5 py-4 text-sm">{{ cita.get_estado_display }}</td>
+                    </tr>
+                {% empty %}<tr><td colspan="4" class="px-5 py-10 text-center text-sm text-slate-500">No hay citas próximas.</td></tr>{% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

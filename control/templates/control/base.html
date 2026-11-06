@@ -1,0 +1,116 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="{% static 'images/odontologia.png' %}">
+    <title>{% block title %}Sonrisa Perfecta{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .form-input, .form-select {
+            width: 100%;
+            border: 1px solid #cbd5e1;
+            border-radius: .5rem;
+            padding: .65rem .8rem;
+            background: #fff;
+            color: #0f172a;
+            transition: all 300ms ease;
+        }
+        .form-input:hover, .form-select:hover { transform: scale(1.01); }
+        .form-input:focus, .form-select:focus {
+            outline: 2px solid transparent;
+            border-color: #0891b2;
+            box-shadow: 0 0 0 3px rgb(8 145 178 / 15%);
+        }
+        @media print {
+            [data-no-print] { display: none !important; }
+            body, main { background: white !important; }
+            main { padding: 0 !important; }
+            .print-shadow-none { box-shadow: none !important; }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-100 text-slate-800">
+    <div class="min-h-screen md:flex">
+        <aside data-no-print class="hidden w-64 shrink-0 bg-slate-950 text-slate-200 md:flex md:flex-col">
+            <a href="{% url 'control:dashboard' %}" class="flex items-center gap-3 border-b border-slate-800 px-5 py-5">
+                <img src="{% static 'images/odontologia.png' %}" alt="Odontología" class="w-8 h-8 object-contain">
+                <span class="font-bold leading-tight">Sonrisa<br><span class="text-cyan-300">Perfecta</span></span>
+            </a>
+            <nav class="flex-1 space-y-1 px-3 py-5 text-sm">
+                <p class="px-3 pb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">Principal</p>
+                <a href="{% url 'control:dashboard' %}" class="block rounded-lg px-3 py-2.5 hover:bg-slate-800">Dashboard</a>
+                <a href="{% url 'control:paciente_list' %}" class="block rounded-lg px-3 py-2.5 hover:bg-slate-800">Pacientes</a>
+                <a href="{% url 'control:odontologo_list' %}" class="block rounded-lg px-3 py-2.5 hover:bg-slate-800">Odontólogos</a>
+                <a href="{% url 'control:especialidad_list' %}" class="block rounded-lg px-3 py-2.5 hover:bg-slate-800">Especialidades</a>
+                <a href="{% url 'control:cita_list' %}" class="block rounded-lg px-3 py-2.5 hover:bg-slate-800">Agenda de citas</a>
+                <a href="{% url 'control:sillon_list' %}" class="block rounded-lg px-3 py-2.5 hover:bg-slate-800">Sillones clínicos</a>
+                <p class="px-3 pb-2 pt-6 text-xs font-semibold uppercase tracking-wider text-slate-500">Atención clínica</p>
+                <a href="{% url 'control:diagnostico_list' %}" class="block rounded-lg px-3 py-2.5 hover:bg-slate-800">Diagnósticos</a>
+                <a href="{% url 'control:tratamiento_list' %}" class="block rounded-lg px-3 py-2.5 hover:bg-slate-800">Tratamientos</a>
+                <a href="{% url 'control:receta_list' %}" class="block rounded-lg px-3 py-2.5 hover:bg-slate-800">Recetas</a>
+                <p class="px-3 pb-2 pt-6 text-xs font-semibold uppercase tracking-wider text-slate-500">Gestión</p>
+                <a href="{% url 'control:reporte_index' %}" class="block rounded-lg px-3 py-2.5 hover:bg-slate-800">Reportes</a>
+            </nav>
+            <div class="border-t border-slate-800 px-5 py-4 text-xs text-slate-500">Sistema de gestión odontológica</div>
+        </aside>
+
+        <div class="min-w-0 flex-1">
+            <header data-no-print class="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-4 sm:px-7">
+                <div class="flex items-center gap-3">
+                    <img src="{% static 'images/odontologia.png' %}" alt="Odontología" class="w-8 h-8 object-contain md:hidden">
+                    <span class="text-sm font-semibold text-slate-700">Panel del consultorio</span>
+                </div>
+                <div class="flex items-center gap-3 sm:gap-5">
+                    {% if request.user.is_authenticated %}
+                        <div class="flex items-center gap-3">
+                            <span class="flex h-10 w-10 items-center justify-center rounded-full bg-cyan-100 text-sm font-bold uppercase text-cyan-900 ring-2 ring-cyan-50">
+                                {% if request.user.get_full_name %}
+                                    {{ request.user.get_full_name|slice:":1" }}
+                                {% else %}
+                                    {{ request.user.username|slice:":1" }}
+                                {% endif %}
+                            </span>
+                            <div class="hidden min-w-0 sm:block">
+                                <p class="max-w-40 truncate text-sm font-semibold text-slate-800">
+                                    {% if request.user.get_full_name %}{{ request.user.get_full_name }}{% else %}{{ request.user.username }}{% endif %}
+                                </p>
+                                <p class="text-xs text-slate-500">
+                                    {% if request.user.is_superuser %}Administrador{% elif request.user.is_staff %}Personal administrativo{% else %}Usuario{% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        <form method="post" action="{% url 'control:logout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-600 transition-all duration-200 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700 focus:outline-none focus:ring-2 focus:ring-cyan-500/40">
+                                Cerrar sesión
+                            </button>
+                        </form>
+                    {% else %}
+                        <a href="{% url 'control:login' %}" class="text-sm font-semibold text-cyan-800 hover:text-cyan-950">Iniciar sesión</a>
+                    {% endif %}
+                </div>
+            </header>
+            <nav data-no-print class="flex gap-2 overflow-x-auto border-b border-slate-200 bg-white px-4 py-2 md:hidden" aria-label="Navegación">
+                <a href="{% url 'control:dashboard' %}" class="whitespace-nowrap rounded-md px-3 py-2 text-sm hover:bg-slate-100">Inicio</a>
+                <a href="{% url 'control:paciente_list' %}" class="whitespace-nowrap rounded-md px-3 py-2 text-sm hover:bg-slate-100">Pacientes</a>
+                <a href="{% url 'control:odontologo_list' %}" class="whitespace-nowrap rounded-md px-3 py-2 text-sm hover:bg-slate-100">Odontólogos</a>
+                <a href="{% url 'control:cita_list' %}" class="whitespace-nowrap rounded-md px-3 py-2 text-sm hover:bg-slate-100">Citas</a>
+                <a href="{% url 'control:diagnostico_list' %}" class="whitespace-nowrap rounded-md px-3 py-2 text-sm hover:bg-slate-100">Clínica</a>
+                <a href="{% url 'control:reporte_index' %}" class="whitespace-nowrap rounded-md px-3 py-2 text-sm hover:bg-slate-100">Reportes</a>
+            </nav>
+            <main class="mx-auto max-w-7xl px-4 py-7 sm:px-7">
+                {% if messages %}
+                    <div data-no-print class="mb-5 space-y-2" aria-live="polite">
+                        {% for message in messages %}
+                            <p class="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+</body>
+</html>
